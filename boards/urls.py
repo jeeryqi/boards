@@ -5,5 +5,5 @@ app_name = 'boards'
 urlpatterns = [
     path('', views.HomeListView.as_view(), name='home'),
     path('<int:board_id>/', views.TopicListView.as_view(), name='topic'),
-    path('<int:board_id>/new/', views.new_topic, name='new_topic'),
+    path('<int:board_id>/new/', views.new_topic_form, name='new_topic'),
 ]

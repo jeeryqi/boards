@@ -3,8 +3,11 @@ from django.urls import reverse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import generic
 from django.contrib.auth.models import User
+from django.forms import modelformset_factory, modelform_factory
 
+from .forms import NewTopicForm
 from .models import Board, Topic, Post
+
 
 # Create your views here.
 class HomeListView(generic.ListView):
@@ -14,6 +17,7 @@ class HomeListView(generic.ListView):
 
     # def get_queryset(self):
     #     return Board.objects.all()
+
 
 class TopicListView(generic.ListView):
     model = Topic
@@ -30,27 +34,49 @@ class TopicListView(generic.ListView):
         context['board'] = self.board
         return context
 
-def new_topic(request, board_id):
+# ModelFormSet写法
+def new_topic_formset(request, board_id):
     board = get_object_or_404(Board, pk=board_id)
-
+    NewTopicFormSet = modelformset_factory(Topic, form=NewTopicForm, fields=('subject', 'message'))
     if request.method == 'POST':
-        subject = request.POST['subject']
-        message = request.POST['message']
+        # return HttpResponse(board.name)
+        formset = NewTopicFormSet(request.POST)
+        if formset.is_valid():
+            for form in formset:
+                user = User.objects.first()
+                topic = form.save(commit=False)
+                topic.board = board
+                topic.starter = user
+                topic.save()
+                Post.objects.create(
+                    message = form.cleaned_data.get('message'),
+                    topic = topic,
+                    created_by = user
+                )
+            return redirect('boards:topic', board_id=board_id)
+    else:
+        formset = NewTopicFormSet(queryset=Topic.objects.none())
 
-        user = User.objects.first()
+    return render(request, 'boards/new_topic.html', {'board': board, 'formset': formset})
 
-        topic = Topic.objects.create(
-            subject = subject,
-            board = board,
-            starter = user
-        )
-
-        post = Post.objects.create(
-            message = message,
-            topic = topic,
-            created_by = user
-        )
-
-        return redirect('boards:topic', pk=board_id)
-
-    return render(request, 'boards/new_topic.html', {'board': board})
+# ModelForm写法
+def new_topic_form(request, board_id):
+    board = get_object_or_404(Board, pk=board_id)
+    user = User.objects.first()  # TODO: get the currently logged in user
+    NewTopicFormForm = modelform_factory(Topic, form=NewTopicForm, fields=('subject', 'message'))
+    if request.method == 'POST':
+        form = NewTopicFormForm(request.POST)
+        if form.is_valid():
+            topic = form.save(commit=False)
+            topic.board = board
+            topic.starter = user
+            topic.save()
+            Post.objects.create(
+                message=form.cleaned_data.get('message'),
+                topic=topic,
+                created_by=user
+            )
+        return redirect('board_topics', board_id=board_id)  # TODO: redirect to the created topic page
+    else:
+        form = NewTopicFormForm(request.GET)
+    return render(request, 'boards/new_topic.html', {'board': board, 'formset': form})
