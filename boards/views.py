@@ -1,7 +1,8 @@
 from django.http import HttpResponse
 from django.urls import reverse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views import generic
+from django.contrib.auth.models import User
 
 from .models import Board, Topic, Post
 
@@ -31,4 +32,25 @@ class TopicListView(generic.ListView):
 
 def new_topic(request, board_id):
     board = get_object_or_404(Board, pk=board_id)
+
+    if request.method == 'POST':
+        subject = request.POST['subject']
+        message = request.POST['message']
+
+        user = User.objects.first()
+
+        topic = Topic.objects.create(
+            subject = subject,
+            board = board,
+            starter = user
+        )
+
+        post = Post.objects.create(
+            message = message,
+            topic = topic,
+            created_by = user
+        )
+
+        return redirect('boards:topic', pk=board_id)
+
     return render(request, 'boards/new_topic.html', {'board': board})
