@@ -43,30 +43,31 @@ def new_topic_formset(request, board_id):
         formset = NewTopicFormSet(request.POST)
         if formset.is_valid():
             for form in formset:
-                user = User.objects.first()
-                topic = form.save(commit=False)
-                topic.board = board
-                topic.starter = user
-                topic.save()
-                Post.objects.create(
-                    message = form.cleaned_data.get('message'),
-                    topic = topic,
-                    created_by = user
-                )
+                if form.is_valid():
+                    user = User.objects.first()
+                    topic = form.save(commit=False)
+                    topic.board = board
+                    topic.starter = user
+                    topic.save()
+                    Post.objects.create(
+                        message = form.cleaned_data.get('message'),
+                        topic = topic,
+                        created_by = user
+                    )
             return redirect('boards:topic', board_id=board_id)
     else:
         formset = NewTopicFormSet(queryset=Topic.objects.none())
 
-    return render(request, 'boards/new_topic.html', {'board': board, 'formset': formset})
+    return render(request, 'boards/new_topic.html', {'board': board, 'form': formset})
 
 # ModelForm写法
 def new_topic_form(request, board_id):
     board = get_object_or_404(Board, pk=board_id)
-    user = User.objects.first()  # TODO: get the currently logged in user
     NewTopicFormForm = modelform_factory(Topic, form=NewTopicForm, fields=('subject', 'message'))
     if request.method == 'POST':
         form = NewTopicFormForm(request.POST)
         if form.is_valid():
+            user = User.objects.first()  # TODO: get the currently logged in user
             topic = form.save(commit=False)
             topic.board = board
             topic.starter = user
@@ -76,7 +77,7 @@ def new_topic_form(request, board_id):
                 topic=topic,
                 created_by=user
             )
-        return redirect('board_topics', board_id=board_id)  # TODO: redirect to the created topic page
+        return redirect('boards:topic', board_id=board_id)  # TODO: redirect to the created topic page
     else:
         form = NewTopicFormForm(request.GET)
-    return render(request, 'boards/new_topic.html', {'board': board, 'formset': form})
+    return render(request, 'boards/new_topic.html', {'board': board, 'form': form})
