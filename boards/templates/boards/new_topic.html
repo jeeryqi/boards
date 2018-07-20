@@ -1,0 +1,13 @@
+{% extends 'boards/base.html' %}
+
+{% block title %}Start a New Topic{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'boards:home' %}">Boards</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'boards:topic' board.pk %}">{{ board.name }}</a></li>
+    <li class="breadcrumb-item active">New topic</li>
+{% endblock %}
+
+{% block content %}
+
+{% endblock %}

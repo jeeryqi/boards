@@ -1,0 +1,13 @@
+{% extends 'boards/base.html' %}
+{% block title %}
+    {{ board.name }} - {{ block.super }}
+{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'boards:home' %}">Boards</a></li>
+            <li class="breadcrumb-item active">{{ board.name }}</li>
+{% endblock %}
+
+{% block content %}
+    <a href="{% url 'boards:new_topic' board.id %}" target="_blank">new topic</a>
+{% endblock %}
