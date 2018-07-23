@@ -1,8 +1,10 @@
 from django import forms
 from .models import Topic
 
+
 class NewTopicForm(forms.ModelForm):
     message = forms.CharField(
+        label=u'内容',
         widget=forms.Textarea(
             attrs={'rows': 5, 'placeholder': 'What is on your mind?'}
         ),
@@ -13,3 +15,6 @@ class NewTopicForm(forms.ModelForm):
     class Meata:
         model = Topic
         fields = ('subject', 'message')
+
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)

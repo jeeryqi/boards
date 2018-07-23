@@ -1,4 +1,4 @@
-{% extends 'boards/base.html' %}
+{% extends 'base.html' %}
 {% block breadcrumb %}
     <li class="breadcrumb-item active">板块</li>
 {% endblock %}
@@ -16,7 +16,7 @@
     <tbody>
 	{% for board in all_boards_list %}
     <tr>
-        <td><a href="{% url 'boards:topic' board.id %}" target="_blank">{{ board.name }}</a>
+        <td><a href="{% url 'boards:topic' board.id %}">{{ board.name }}</a>
             <small class="text-muted d-block">{{ board.description }}</small></td>
       <td class="align-middle">0</td>
       <td class="align-middle">0</td>

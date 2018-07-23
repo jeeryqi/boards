@@ -37,10 +37,9 @@ class TopicListView(generic.ListView):
 # ModelFormSet写法
 def new_topic_formset(request, board_id):
     board = get_object_or_404(Board, pk=board_id)
-    NewTopicFormSet = modelformset_factory(Topic, form=NewTopicForm, fields=('subject', 'message'))
+    newtopicformset = modelformset_factory(Topic, form=NewTopicForm, fields=('subject', 'message'))
     if request.method == 'POST':
-        # return HttpResponse(board.name)
-        formset = NewTopicFormSet(request.POST)
+        formset = newtopicformset(request.POST)
         if formset.is_valid():
             for form in formset:
                 if form.is_valid():
@@ -56,16 +55,16 @@ def new_topic_formset(request, board_id):
                     )
             return redirect('boards:topic', board_id=board_id)
     else:
-        formset = NewTopicFormSet(queryset=Topic.objects.none())
+        formset = newtopicformset(queryset=Topic.objects.none())
 
     return render(request, 'boards/new_topic.html', {'board': board, 'form': formset})
 
 # ModelForm写法
 def new_topic_form(request, board_id):
     board = get_object_or_404(Board, pk=board_id)
-    NewTopicFormForm = modelform_factory(Topic, form=NewTopicForm, fields=('subject', 'message'))
+    newtopicform = modelform_factory(Topic, form=NewTopicForm, fields=('subject', 'message'))
     if request.method == 'POST':
-        form = NewTopicFormForm(request.POST)
+        form = newtopicform(request.POST)
         if form.is_valid():
             user = User.objects.first()  # TODO: get the currently logged in user
             topic = form.save(commit=False)
@@ -79,5 +78,5 @@ def new_topic_form(request, board_id):
             )
         return redirect('boards:topic', board_id=board_id)  # TODO: redirect to the created topic page
     else:
-        form = NewTopicFormForm(request.GET)
+        form = newtopicform()
     return render(request, 'boards/new_topic.html', {'board': board, 'form': form})
