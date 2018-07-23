@@ -10,13 +10,13 @@ class Board(models.Model):
         return self.name
 
 class Topic(models.Model):
-    subject = models.CharField(u'主题', max_length=255, error_messages={'required': (u'必填')})
+    subject = models.CharField(max_length=255)
     last_updated = models.DateTimeField(auto_now_add=True)
     board = models.ForeignKey(Board, related_name='topics', on_delete=models.CASCADE)
     starter = models.ForeignKey(User, related_name='topics', on_delete=models.CASCADE)
 
 class Post(models.Model):
-    message = models.TextField(u'内容', max_length=4000, )
+    message = models.TextField(max_length=4000, )
     topic = models.ForeignKey(Topic, related_name='posts', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)

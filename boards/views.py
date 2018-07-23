@@ -59,8 +59,8 @@ def new_topic_formset(request, board_id):
 
     return render(request, 'boards/new_topic.html', {'board': board, 'form': formset})
 
-# ModelForm写法
-def new_topic_form(request, board_id):
+# ModelFormfactory写法
+def new_topic_form_factory(request, board_id):
     board = get_object_or_404(Board, pk=board_id)
     newtopicform = modelform_factory(Topic, form=NewTopicForm, fields=('subject', 'message'))
     if request.method == 'POST':
@@ -79,4 +79,26 @@ def new_topic_form(request, board_id):
         return redirect('boards:topic', board_id=board_id)  # TODO: redirect to the created topic page
     else:
         form = newtopicform()
+    return render(request, 'boards/new_topic.html', {'board': board, 'form': form})
+
+# ModelForm写法
+def new_topic_form(request, board_id):
+    board = get_object_or_404(Board, pk=board_id)
+    # newtopicform = modelform_factory(Topic, form=NewTopicForm, fields=('subject', 'message'))
+    if request.method == 'POST':
+        form = NewTopicForm(request.POST)
+        if form.is_valid():
+            user = User.objects.first()  # TODO: get the currently logged in user
+            topic = form.save(commit=False)
+            topic.board = board
+            topic.starter = user
+            topic.save()
+            Post.objects.create(
+                message=form.cleaned_data.get('message'),
+                topic=topic,
+                created_by=user
+            )
+            return redirect('boards:topic', board_id=board_id)  # TODO: redirect to the created topic page
+    else:
+        form = NewTopicForm()
     return render(request, 'boards/new_topic.html', {'board': board, 'form': form})

@@ -12,9 +12,6 @@ class NewTopicForm(forms.ModelForm):
         help_text='最长4000字！'
     )
 
-    class Meata:
+    class Meta:
         model = Topic
         fields = ('subject', 'message')
-
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
