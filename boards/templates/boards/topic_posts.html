@@ -12,7 +12,7 @@
     <div class="mb-4">
         <a href="{% url 'boards:reply_topic' topic.board.id topic.id %}" class="btn btn-primary" role="button">回复</a>
     </div>
-    {% for post in topic.posts.all %}
+    {% for post in posts %}
         <div class="card mb-2 {% if forloop.first %}border-dark{% endif %}">
             {% if forloop.first %}
                 <div class="card-header text-white bg-dark py-2 px-3">{{ topic.subject }}</div>
@@ -35,7 +35,8 @@
                         {{ post.message }}
                         {% if post.created_by == user %}
                             <div class="mt-3">
-                                <a href="#" class="btn btn-primary btn-sm" role="button">编辑</a>
+                                <a href="{% url 'boards:edit_post' post.topic.board.pk post.topic.pk post.pk %}"
+                                   class="btn btn-primary btn-sm" role="button">编辑</a>
                             </div>
                         {% endif %}
                     </div>
@@ -43,4 +44,7 @@
             </div>
         </div>
     {% endfor %}
+
+    {% include 'includes/pagination.html' %}
+
 {% endblock %}

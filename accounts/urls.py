@@ -1,5 +1,6 @@
 from django.urls import path, reverse_lazy
 from django.contrib.auth import views as auth_views
+from accounts import views as accounts_views
 
 from . import views
 
@@ -29,5 +30,6 @@ urlpatterns = [
     path('settings/password/done/',
          auth_views.PasswordChangeDoneView.as_view(template_name='accounts/password_change_done.html'),
          name='password_change_done'),
+    path('settings/account/', views.UserUpdateView.as_view(), name='my_account'),
 
 ]
