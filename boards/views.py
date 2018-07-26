@@ -172,6 +172,9 @@ def reply_topic(request, board_id, topic_id):
             post.topic = topic
             post.created_by = request.user
             post.save()
+
+            topic.last_updated = post.created_at# timezone.now()
+            topic.save()
             return redirect('boards:topic_posts', board_id=board_id, topic_id=topic_id)
     else:
         form = PostForm()
